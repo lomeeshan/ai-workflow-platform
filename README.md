@@ -42,7 +42,7 @@ The platform serves as the foundation for a future AI-powered workflow automatio
 - Python 3.11+
 - FastAPI
 - SQLModel
-- SQLite
+- PostgreSQL
 
 ### Validation
 
@@ -59,8 +59,6 @@ The platform serves as the foundation for a future AI-powered workflow automatio
 - GitHub
 
 ### Future Technologies
-
-- PostgreSQL
 - OpenAI API / Groq API
 - Docker
 - React
@@ -109,7 +107,7 @@ Database Layer
 
 ↓
 
-SQLite Database
+PostgreSQL Database
 
 ### Responsibilities
 
