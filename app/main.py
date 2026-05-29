@@ -1,55 +1,95 @@
-from fastapi import FastAPI, HTTPException
-from app.schemas import Task
+from fastapi import FastAPI
+
+from app.database import create_db_and_tables
+from app.models import Task
+from app import crud
 
 app = FastAPI()
 
-tasks = []
+# -----------------------------
+# Startup Event
+# -----------------------------
+@app.on_event("startup")
+def on_startup():
+    create_db_and_tables()
 
+# -----------------------------
+# Home Route
+# -----------------------------
 @app.get("/")
 def home():
     return {"message": "AI Workflow Platform API is running"}
 
+# -----------------------------
+# Health Check
+# -----------------------------
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
 
-@app.get("/tasks")
-def get_tasks():
-    return {"tasks": tasks}
-
+# -----------------------------
+# Create Task
+# -----------------------------
 @app.post("/tasks")
 def create_task(task: Task):
 
-    tasks.append(task.dict())
+    created_task = crud.create_task(task)
 
     return {
         "message": "Task created successfully",
-        "task": task
+        "task": created_task
     }
 
+# -----------------------------
+# Get All Tasks
+# -----------------------------
+@app.get("/tasks")
+def get_tasks():
+
+    tasks = crud.get_all_tasks()
+
+    return {"tasks": tasks}
+
+# -----------------------------
+# Get Single Task
+# -----------------------------
 @app.get("/tasks/{task_id}")
 def get_task(task_id: int):
 
-    if task_id >= len(tasks):
-        raise HTTPException(
-            status_code=404,
-            detail="Task not found"
-        )
+    return crud.get_task(task_id)
 
-    return tasks[task_id]
+# -----------------------------
+# Update Task
+# -----------------------------
+@app.put("/tasks/{task_id}")
+def update_task(task_id: int, updated_task: Task):
 
+    updated = crud.update_task(task_id, updated_task)
+
+    return {
+        "message": "Task updated successfully",
+        "task": updated
+    }
+
+# -----------------------------
+# Delete Task
+# -----------------------------
 @app.delete("/tasks/{task_id}")
 def delete_task(task_id: int):
 
-    if task_id >= len(tasks):
-        raise HTTPException(
-            status_code=404,
-            detail="Task not found"
-        )
+    return crud.delete_task(task_id)
 
-    deleted_task = tasks.pop(task_id)
 
-    return {
-        "message": "Task deleted successfully",
-        "deleted_task": deleted_task
-    }
+@app.get("/tasks/filter/")
+def filter_tasks(priority: str):
+
+    tasks = crud.get_all_tasks()
+
+    filtered_tasks = [
+        task for task in tasks
+        if task.priority.lower() == priority.lower()
+    ]
+
+    return {"tasks": filtered_tasks}
+
+
