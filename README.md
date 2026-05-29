@@ -69,43 +69,27 @@ The platform serves as the foundation for a future AI-powered workflow automatio
 
 ## Project Structure
 
+```text
 ai-workflow-platform/
-
-├── app/
-
-│ ├── main.py
-
-│ ├── crud.py
-
-│ ├── database.py
-
-│ ├── models.py
-
-│ ├── schemas.py
-
-│ │
-
-│ ├── routes/
-
-│ │ └── registration.py
-
-│ │
-
-│ └── services/
-
-│ └── workflow_service.py
-
 │
-
+├── app/
+│   ├── main.py
+│   ├── crud.py
+│   ├── database.py
+│   ├── models.py
+│   ├── schemas.py
+│   │
+│   ├── routes/
+│   │   └── registration.py
+│   │
+│   └── services/
+│       └── workflow_service.py
+│
 ├── .gitignore
-
 ├── requirements.txt
-
 ├── README.md
-
 └── LICENSE
-
----
+```
 
 ## Architecture Overview
 
