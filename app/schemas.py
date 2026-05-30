@@ -7,6 +7,16 @@ class TaskCreate(BaseModel):
     description: str
 
 
+class TaskUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    category: Optional[str] = None
+    priority: Optional[str] = None
+    estimated_effort: Optional[str] = None
+    ai_summary: Optional[str] = None
+    ai_reasoning: Optional[str] = None
+
+
 class TaskRead(BaseModel):
     id: int
     title: str
