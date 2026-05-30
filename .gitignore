@@ -1,5 +1,18 @@
+# Virtual environments
 venv/
+.venv/
+
+# Python cache files
 __pycache__/
+*.pyc
+
+# Local databases
 *.db
+*.sqlite
+*.sqlite3
+
+# Environment variables / secrets
 .env
+
+# macOS files
 .DS_Store
