@@ -6,11 +6,12 @@ from sqlmodel import Session
 from app.database import get_session
 from app.schemas import TaskCreate, TaskUpdate, TaskRead
 from app.services.workflow_service import create_ai_analyzed_task
+from app.exceptions import LLMServiceError, InvalidLLMResponseError
 from app import crud
 
 
-router = APIRouter()
 
+router = APIRouter()
 
 @router.post("/tasks", response_model=TaskRead)
 def create_task(task_data: TaskCreate, db: Session = Depends(get_session)):
@@ -18,8 +19,23 @@ def create_task(task_data: TaskCreate, db: Session = Depends(get_session)):
         task = create_ai_analyzed_task(db=db, task_data=task_data)
         return task
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except LLMServiceError:
+        raise HTTPException(
+            status_code=503,
+            detail="AI analysis service is currently unavailable. Please try again later.",
+        )
+
+    except InvalidLLMResponseError:
+        raise HTTPException(
+            status_code=502,
+            detail="AI analysis service returned an invalid response. Please try again.",
+        )
+
+    except Exception:
+        raise HTTPException(
+            status_code=500,
+            detail="An unexpected error occurred while creating the task.",
+        )
 
 
 @router.get("/tasks", response_model=list[TaskRead])
