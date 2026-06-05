@@ -5,7 +5,7 @@ from sqlmodel import Session
 
 from app.database import get_session
 from app.schemas import TaskCreate, TaskUpdate, TaskRead
-from app.services.workflow_service import create_ai_analyzed_task
+from app.services.workflow_service import create_ai_analyzed_task, reanalyze_existing_task
 from app.exceptions import LLMServiceError, InvalidLLMResponseError
 from app import crud
 
@@ -57,6 +57,36 @@ def filter_tasks(
         estimated_effort=estimated_effort,
     )
 
+@router.post("/tasks/{task_id}/reanalyze", response_model=TaskRead)
+def reanalyze_task(task_id: int, db: Session = Depends(get_session)):
+    try:
+        updated_task = reanalyze_existing_task(db=db, task_id=task_id)
+
+        if not updated_task:
+            raise HTTPException(status_code=404, detail="Task not found")
+
+        return updated_task
+
+    except LLMServiceError:
+        raise HTTPException(
+            status_code=503,
+            detail="AI analysis service is currently unavailable. Please try again later.",
+        )
+
+    except InvalidLLMResponseError:
+        raise HTTPException(
+            status_code=502,
+            detail="AI analysis service returned an invalid response. Please try again.",
+        )
+
+    except HTTPException:
+        raise
+
+    except Exception:
+        raise HTTPException(
+            status_code=500,
+            detail="An unexpected error occurred while re-analyzing the task.",
+        )
 
 @router.get("/tasks/{task_id}", response_model=TaskRead)
 def read_task(task_id: int, db: Session = Depends(get_session)):

@@ -6,14 +6,6 @@ from app import crud
 
 
 def create_ai_analyzed_task(db: Session, task_data: TaskCreate):
-    """
-    Coordinates the workflow:
-    1. Send task to LLM
-    2. Get structured analysis
-    3. Save task + analysis to database
-    4. Return saved task
-    """
-
     analysis = analyze_task_with_llm(
         title=task_data.title,
         description=task_data.description,
@@ -26,3 +18,23 @@ def create_ai_analyzed_task(db: Session, task_data: TaskCreate):
     )
 
     return saved_task
+
+
+def reanalyze_existing_task(db: Session, task_id: int):
+    task = crud.get_task_by_id(db=db, task_id=task_id)
+
+    if not task:
+        return None
+
+    analysis = analyze_task_with_llm(
+        title=task.title,
+        description=task.description,
+    )
+
+    updated_task = crud.update_task_analysis(
+        db=db,
+        task_id=task_id,
+        analysis=analysis,
+    )
+
+    return updated_task

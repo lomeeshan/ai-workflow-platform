@@ -82,3 +82,32 @@ def filter_tasks(
 
     results = db.exec(statement).all()
     return results
+
+def update_task_analysis(db: Session, task_id: int, analysis: TaskAnalysis):
+    task = db.get(Task, task_id)
+
+    if not task:
+        return None
+
+    task.category = analysis.category
+    task.priority = analysis.priority
+    task.estimated_effort = analysis.estimated_effort
+    task.ai_summary = analysis.summary
+    task.ai_reasoning = analysis.reasoning
+
+    db.add(task)
+    db.commit()
+    db.refresh(task)
+
+    return task
+
+
+
+
+
+
+
+
+
+
+
