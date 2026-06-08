@@ -3,7 +3,10 @@ from sqlmodel import Session, select
 
 from app.models import Task
 from app.schemas import TaskCreate, TaskUpdate, TaskAnalysis
+from datetime import datetime, timezone
 
+def utc_now():
+    return datetime.now(timezone.utc)
 
 def create_task(db: Session, task_data: TaskCreate, analysis: TaskAnalysis) -> Task:
     task = Task(
@@ -44,6 +47,9 @@ def update_task(db: Session, task_id: int, task_update: TaskUpdate):
     for key, value in update_data.items():
         setattr(task, key, value)
 
+    task.updated_at = utc_now()
+
+    
     db.add(task)
     db.commit()
     db.refresh(task)
@@ -68,6 +74,7 @@ def filter_tasks(
     category: Optional[str] = None,
     priority: Optional[str] = None,
     estimated_effort: Optional[str] = None,
+    status: Optional[str] = None,
 ):
     statement = select(Task)
 
@@ -80,8 +87,14 @@ def filter_tasks(
     if estimated_effort:
         statement = statement.where(Task.estimated_effort == estimated_effort)
 
+    if status:
+        statement = statement.where(Task.status == status)
+
     results = db.exec(statement).all()
     return results
+
+
+
 
 def update_task_analysis(db: Session, task_id: int, analysis: TaskAnalysis):
     task = db.get(Task, task_id)
@@ -94,6 +107,7 @@ def update_task_analysis(db: Session, task_id: int, analysis: TaskAnalysis):
     task.estimated_effort = analysis.estimated_effort
     task.ai_summary = analysis.summary
     task.ai_reasoning = analysis.reasoning
+    task.updated_at = utc_now()
 
     db.add(task)
     db.commit()

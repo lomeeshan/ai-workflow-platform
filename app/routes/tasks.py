@@ -48,6 +48,7 @@ def filter_tasks(
     category: Optional[str] = None,
     priority: Optional[str] = None,
     estimated_effort: Optional[str] = None,
+    status: Optional[str] = None,
     db: Session = Depends(get_session),
 ):
     return crud.filter_tasks(
@@ -55,6 +56,7 @@ def filter_tasks(
         category=category,
         priority=priority,
         estimated_effort=estimated_effort,
+        status=status,
     )
 
 @router.post("/{task_id}/reanalyze", response_model=TaskRead)

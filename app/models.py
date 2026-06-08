@@ -1,5 +1,11 @@
+from datetime import datetime, timezone
 from typing import Optional
+
 from sqlmodel import SQLModel, Field
+
+
+def utc_now():
+    return datetime.now(timezone.utc)
 
 
 class Task(SQLModel, table=True):
@@ -15,3 +21,8 @@ class Task(SQLModel, table=True):
     estimated_effort: Optional[str] = None
     ai_summary: Optional[str] = None
     ai_reasoning: Optional[str] = None
+
+    # Workflow lifecycle fields
+    status: str = Field(default="pending")
+    created_at: datetime = Field(default_factory=utc_now)
+    updated_at: datetime = Field(default_factory=utc_now)
