@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routes import registration
+from app.routes import tasks
 
 
 app = FastAPI()
@@ -15,6 +15,6 @@ def health_check():
     return {"status": "healthy"}
 
 
-app.include_router(registration.router)
+app.include_router(tasks.router)
 
 

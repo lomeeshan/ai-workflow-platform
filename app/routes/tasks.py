@@ -11,9 +11,9 @@ from app import crud
 
 
 
-router = APIRouter()
+router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
-@router.post("/tasks", response_model=TaskRead)
+@router.post("/", response_model=TaskRead)
 def create_task(task_data: TaskCreate, db: Session = Depends(get_session)):
     try:
         task = create_ai_analyzed_task(db=db, task_data=task_data)
@@ -38,12 +38,12 @@ def create_task(task_data: TaskCreate, db: Session = Depends(get_session)):
         )
 
 
-@router.get("/tasks", response_model=list[TaskRead])
+@router.get("/", response_model=list[TaskRead])
 def read_tasks(db: Session = Depends(get_session)):
     return crud.get_tasks(db)
 
 
-@router.get("/tasks/filter/", response_model=list[TaskRead])
+@router.get("/filter/", response_model=list[TaskRead])
 def filter_tasks(
     category: Optional[str] = None,
     priority: Optional[str] = None,
@@ -57,7 +57,7 @@ def filter_tasks(
         estimated_effort=estimated_effort,
     )
 
-@router.post("/tasks/{task_id}/reanalyze", response_model=TaskRead)
+@router.post("/{task_id}/reanalyze", response_model=TaskRead)
 def reanalyze_task(task_id: int, db: Session = Depends(get_session)):
     try:
         updated_task = reanalyze_existing_task(db=db, task_id=task_id)
@@ -88,7 +88,7 @@ def reanalyze_task(task_id: int, db: Session = Depends(get_session)):
             detail="An unexpected error occurred while re-analyzing the task.",
         )
 
-@router.get("/tasks/{task_id}", response_model=TaskRead)
+@router.get("/{task_id}", response_model=TaskRead)
 def read_task(task_id: int, db: Session = Depends(get_session)):
     task = crud.get_task_by_id(db=db, task_id=task_id)
 
@@ -98,7 +98,7 @@ def read_task(task_id: int, db: Session = Depends(get_session)):
     return task
 
 
-@router.put("/tasks/{task_id}", response_model=TaskRead)
+@router.put("/{task_id}", response_model=TaskRead)
 def update_task(
     task_id: int,
     task_update: TaskUpdate,
@@ -116,7 +116,7 @@ def update_task(
     return updated_task
 
 
-@router.delete("/tasks/{task_id}")
+@router.delete("/{task_id}")
 def delete_task(task_id: int, db: Session = Depends(get_session)):
     deleted_task = crud.delete_task(db=db, task_id=task_id)
 
